@@ -16,17 +16,17 @@ public class WaiterController {
     private final WaiterService waiterService;
 
     @PostMapping("/{waiterId}/createOrder")
-    public void createOrder(@RequestParam(name="number") Integer number,
+    public void createOrder(@RequestParam(name="numberTable") Integer number,
                             @PathVariable(name="waiterId") Integer waiterId
     ){
         waiterService.createOrder(waiterId, number);
     }
-    @PostMapping("/{waiterId}/addDishToOder")
-    public void addDishToOrder(@PathVariable(name = "waiterId") Integer waiterId,
+    @PostMapping("/{waiterId}/addDishes")
+    public void addDishesToOrder(@PathVariable(name = "waiterId") Integer waiterId,
                                @RequestParam(name = "orderId") Integer orderId,
-                               @RequestBody DishDTO dishDTO
+                               @RequestParam(name = "dishesId") Integer [] dishesId
     ){
-        waiterService.addDishToOrder(waiterId,orderId,dishDTO);
+        waiterService.addDishesToOrder(waiterId,orderId,dishesId);
     }
     @GetMapping("/{waiterId}/getOrders/")
     public List<OrderDTO> getOrders(@PathVariable(name = "waiterId") Integer waiterId,

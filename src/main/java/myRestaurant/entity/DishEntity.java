@@ -39,4 +39,7 @@ public class DishEntity implements Serializable {
     inverseJoinColumns = @JoinColumn(name = "order_id"))
     private List<OrderEntity> orderEntityList;
 
+    @Column(name = "dish_status")
+    private String dishStatus;
+
 }

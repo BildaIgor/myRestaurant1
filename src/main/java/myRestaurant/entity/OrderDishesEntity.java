@@ -21,16 +21,10 @@ public class OrderDishesEntity implements Serializable {
     @Column(name = "id")
     private int id;
 
-    @Column(name="order_id")
+    @Column(name = "order_id")
     private int orderId;
 
     @Column(name = "dish_id")
     private int dishId;
-
-    @Column(name = "order_status")
-    private String orderStatus;
-
-    @Column(name = "dished_status")
-    private String dishedStatus;
 }
 

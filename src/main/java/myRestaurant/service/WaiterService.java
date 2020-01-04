@@ -14,12 +14,15 @@ import myRestaurant.entity.WaiterEntity;
 import myRestaurant.repository.MenuRepository;
 import myRestaurant.repository.OrderRepository;
 import myRestaurant.repository.WaiterRepository;
+import myRestaurant.utils.DishStatus;
+import myRestaurant.utils.OrderStatus;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -37,12 +40,13 @@ public class WaiterService {
                 .timeOfCreation(new Date())
                 .dishes(new ArrayList<>())
                 .waiterId(waiterId)
+                .orderStatus(OrderStatus.NEW.getTitle())
                 .build();
         orderRepository.save(orderEntity);
     }
-    public void addDishToOrder(Integer waiterId, Integer orderId, DishDTO dishDTO){
+    public void addDishesToOrder(Integer waiterId, Integer orderId, Integer [] dishesId){
       OrderEntity orderEntity = orderRepository.getById(orderId);
-      orderEntity.getDishes().add(DishConverter.toDishEntity(dishDTO));
+      Arrays.stream(dishesId).forEach(dishId->orderEntity.getDishes().add(DishConverter.toDishEntity(menuRepository.getById(dishId), DishStatus.NEW)));
       orderRepository.save(orderEntity);
     }
     public List<OrderDTO> getOrders(Integer waiterId, Integer orderId){

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import myRestaurant.utils.OrderStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -36,5 +37,8 @@ public class OrderEntity implements Serializable {
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "dish_id"))
     private List<DishEntity> dishes;
+
+    @Column(name = "order_status")
+    private String orderStatus;
 
 }

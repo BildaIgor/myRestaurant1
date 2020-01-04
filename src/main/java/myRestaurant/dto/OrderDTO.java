@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import myRestaurant.utils.OrderStatus;
 
 import java.util.Date;
 import java.util.List;
@@ -18,4 +19,5 @@ public class OrderDTO {
     private Date timeOfCreation;
     private List<DishDTO> dishes;
     private int waiterId;
+    private OrderStatus orderStatus;
 }
