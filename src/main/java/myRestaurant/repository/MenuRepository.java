@@ -4,8 +4,12 @@ import myRestaurant.entity.MenuEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import java.util.List;
 
 public interface MenuRepository extends JpaRepository<MenuEntity, Integer> {
     MenuEntity getById(int id);
+    List<MenuEntity> getAllByCategory(String category);
+    List<MenuEntity> getAllByNameContaining(String name);
+
 
 }

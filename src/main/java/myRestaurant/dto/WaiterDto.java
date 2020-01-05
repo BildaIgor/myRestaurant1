@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Component
 @Builder
-public class WaiterDTO {
+public class WaiterDto {
     private int id;
     private String name;
 }

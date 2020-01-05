@@ -13,11 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderDTO {
+public class OrderDto {
     private int id;
     private int number;
     private Date timeOfCreation;
-    private List<DishDTO> dishes;
+    private List<DishDto> dishes;
     private int waiterId;
     private OrderStatus orderStatus;
 }

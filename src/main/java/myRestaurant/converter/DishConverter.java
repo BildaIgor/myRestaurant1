@@ -1,13 +1,13 @@
 package myRestaurant.converter;
 
-import myRestaurant.dto.DishDTO;
+import myRestaurant.dto.DishDto;
 import myRestaurant.entity.DishEntity;
 import myRestaurant.entity.MenuEntity;
 import myRestaurant.utils.DishStatus;
 
 public class DishConverter {
-    public static DishDTO toDishDTO(DishEntity dishEntity){
-        return DishDTO.builder()
+    public static DishDto toDishDTO(DishEntity dishEntity){
+        return DishDto.builder()
                 .id(dishEntity.getMenuId())
                 .category(dishEntity.getCategory())
                 .name(dishEntity.getName())
