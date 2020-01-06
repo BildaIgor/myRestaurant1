@@ -10,4 +10,5 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Integer> {
     List<OrderEntity> getAllByWaiterId(int waiterId);
 
 
+
 }

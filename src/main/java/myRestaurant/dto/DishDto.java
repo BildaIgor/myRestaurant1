@@ -12,6 +12,7 @@ import myRestaurant.utils.DishStatus;
 @Builder
 public class DishDto {
     private int id;
+    private int menuId;
     private String category;
     private String name;
     private int price;

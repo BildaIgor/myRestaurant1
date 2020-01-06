@@ -41,4 +41,7 @@ public class OrderEntity implements Serializable {
     @Column(name = "order_status")
     private String orderStatus;
 
+    @Column(name = "check_amount")
+    private int checkAmount;
+
 }

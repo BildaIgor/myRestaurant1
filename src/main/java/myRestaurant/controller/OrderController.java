@@ -8,6 +8,8 @@ import myRestaurant.dto.OrderDto;
 import myRestaurant.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Transient;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController
@@ -39,6 +41,11 @@ public class OrderController {
     @GetMapping("/findDishesInMenuByName")
     public List<MenuDto> findDishesInMenuByName(@RequestParam(name = "name") String name){
         return orderService.getDishesInMenuByName(name);
+    }
+    @PostMapping("/removeDish")
+    public void removeDish(@RequestParam(name = "orderId") Integer orderId,
+                           @RequestParam(name = "dishId") Integer dishId){
+        orderService.removeDishFromOrder(orderId, dishId);
     }
 
 

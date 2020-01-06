@@ -4,10 +4,7 @@ public enum DishStatus {
     NEW("NEW"),
     IN_COOKING("IN_COOKING"),
     COOKED("COOKED"),
-    GIVEN("GIVEN"),
     CLOSED("CLOSED");
-
-
 
     private String title;
 

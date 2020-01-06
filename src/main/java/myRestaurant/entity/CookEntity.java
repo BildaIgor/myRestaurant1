@@ -13,8 +13,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="waiter")
-public class WaiterEntity implements Serializable {
+@Table(name="cook")
+public class CookEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -23,7 +23,9 @@ public class WaiterEntity implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "percentage_of_sales")
-    private double percentageOfSales;
+    @Column(name = "position")
+    private String position;
 
+    @Column(name = "cooking_time")
+    private int cookingTime;
 }

@@ -8,7 +8,8 @@ import myRestaurant.utils.DishStatus;
 public class DishConverter {
     public static DishDto toDishDTO(DishEntity dishEntity){
         return DishDto.builder()
-                .id(dishEntity.getMenuId())
+                .menuId(dishEntity.getMenuId())
+                .id(dishEntity.getId())
                 .category(dishEntity.getCategory())
                 .name(dishEntity.getName())
                 .price(dishEntity.getPrice())

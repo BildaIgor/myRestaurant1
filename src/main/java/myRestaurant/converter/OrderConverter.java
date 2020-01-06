@@ -20,6 +20,7 @@ public class OrderConverter {
                 .dishes(dishDtos)
                 .waiterId(orderEntity.getWaiterId())
                 .orderStatus(OrderStatus.valueOf(orderEntity.getOrderStatus()))
+                .checkAmount(orderEntity.getCheckAmount())
                 .build();
     }
 }

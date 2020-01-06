@@ -1,9 +1,8 @@
 package myRestaurant.utils;
 
 public enum OrderStatus {
-    NEW ("NEW"),
-    PROCESSED("PROCESSED"),
-    CLOSE("CLOSE");
+    OPENED ("OPENED"),
+    CLOSED("CLOSED");
     private String title;
 
     OrderStatus(String title){

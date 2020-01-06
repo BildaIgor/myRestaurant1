@@ -20,4 +20,5 @@ public class OrderDto {
     private List<DishDto> dishes;
     private int waiterId;
     private OrderStatus orderStatus;
+    private int checkAmount;
 }
