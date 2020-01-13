@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface DishRepository extends JpaRepository<DishEntity, Integer> {
     DishEntity getById(int dishId);
-    List<DishEntity> getAllByDishStatus(String category);
+
 }

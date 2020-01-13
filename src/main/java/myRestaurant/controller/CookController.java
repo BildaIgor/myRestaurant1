@@ -15,24 +15,24 @@ import java.util.List;
 public class CookController {
     private final CookService cookService;
 
-    @GetMapping("/getNewDishes")
-    public List<DishDto> getNewDishes(){
-        return cookService.getNewDishes();
-    }
-
-    @PostMapping("/startCooking")
-    public void startCooking(@RequestParam(name = "dishId") Integer dishId){
-        cookService.startCooking(dishId);
-    }
-
-    @PostMapping("/endCooking")
-    public void endCooking(@RequestParam(name = "dishId") Integer dishId){
-        cookService.endCooking(dishId);
-    }
-
-    @PostMapping("/setCookingTime")
-    public void setCookingTime(@RequestParam(name = "cookId")Integer cookId,
-                               @RequestParam(name = "cookingTime")Integer cookingTime){
-        cookService.setCookingTime(cookId , cookingTime);
-    }
+//    @GetMapping("/getNewDishes")
+//    public List<DishDto> getNewDishes(){
+//        return cookService.getNewDishes();
+//    }
+//
+//    @PostMapping("/startCooking")
+//    public void startCooking(@RequestParam(name = "dishId") Integer dishId){
+//        cookService.startCooking(dishId);
+//    }
+//
+//    @PostMapping("/endCooking")
+//    public void endCooking(@RequestParam(name = "dishId") Integer dishId){
+//        cookService.endCooking(dishId);
+//    }
+//
+//    @PostMapping("/setCookingTime")
+//    public void setCookingTime(@RequestParam(name = "cookId")Integer cookId,
+//                               @RequestParam(name = "cookingTime")Integer cookingTime){
+//        cookService.setCookingTime(cookId , cookingTime);
+//    }
 }

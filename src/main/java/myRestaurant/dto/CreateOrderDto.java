@@ -14,5 +14,4 @@ import java.util.List;
 public class CreateOrderDto {
     private int tableNumber;
     private int waiterId;
-    private List<Integer> dishesId;
 }

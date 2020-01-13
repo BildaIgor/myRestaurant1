@@ -34,19 +34,19 @@ public class OrderController {
     ){
         return orderService.getOrders(waiterId,orderId);
     }
-    @GetMapping("/getDishesInMenuByCategory")
-    public List<MenuDto> getDishesInMenuByCategory(@RequestParam(name = "category") String category){
-        return orderService.getDishesInMenuByCategory(category);
-    }
-    @GetMapping("/findDishesInMenuByName")
-    public List<MenuDto> findDishesInMenuByName(@RequestParam(name = "name") String name){
-        return orderService.getDishesInMenuByName(name);
-    }
-    @PostMapping("/removeDish")
-    public void removeDish(@RequestParam(name = "orderId") Integer orderId,
-                           @RequestParam(name = "dishId") Integer dishId){
-        orderService.removeDishFromOrder(orderId, dishId);
-    }
+//    @GetMapping("/getDishesInMenuByCategory")
+//    public List<MenuDto> getDishesInMenuByCategory(@RequestParam(name = "category") String category){
+//        return orderService.getDishesInMenuByCategory(category);
+//    }
+//    @GetMapping("/findDishesInMenuByName")
+//    public List<MenuDto> findDishesInMenuByName(@RequestParam(name = "name") String name){
+//        return orderService.getDishesInMenuByName(name);
+//    }
+//    @PostMapping("/removeDish")
+//    public void removeDish(@RequestParam(name = "orderId") Integer orderId,
+//                           @RequestParam(name = "dishId") Integer dishId){
+//        orderService.removeDishFromOrder(orderId, dishId);
+//    }
 
 
 }

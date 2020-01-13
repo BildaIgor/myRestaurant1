@@ -21,9 +21,6 @@ public class DishEntity implements Serializable {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "menu_id")
-    private int menuId;
-
     @Column(name="category")
     private String category;
 
@@ -38,8 +35,5 @@ public class DishEntity implements Serializable {
     joinColumns = @JoinColumn(name = "dish_id"),
     inverseJoinColumns = @JoinColumn(name = "order_id"))
     private List<OrderEntity> orderEntityList;
-
-    @Column(name = "dish_status")
-    private String dishStatus;
 
 }

@@ -26,5 +26,10 @@ public class OrderDishesEntity implements Serializable {
 
     @Column(name = "dish_id")
     private int dishId;
+
+    @Column(name = "dish_status")
+    private String dishStatus;
+
+
 }
 

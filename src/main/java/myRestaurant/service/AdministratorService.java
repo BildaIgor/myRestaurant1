@@ -14,9 +14,6 @@ import org.springframework.stereotype.Service;
 public class AdministratorService {
     private final WaiterRepository waiterRepository;
     private final CookRepository cookRepository;
-    private final MenuRepository menuRepository;
-    private final DishRepository dishRepository;
-    private final OrderRepository orderRepository;
 
     public void createWaiter(WaiterDto waiterDto){
         waiterRepository.save(WaiterConverter.toWaiterEntity(waiterDto));
