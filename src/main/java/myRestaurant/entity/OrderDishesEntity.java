@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Builder
@@ -29,6 +30,18 @@ public class OrderDishesEntity implements Serializable {
 
     @Column(name = "dish_status")
     private String dishStatus;
+
+    @Column(name = "add_time")
+    private Date addTime;
+
+    @Column(name = "start_cooking_time")
+    private Date startCookingTime;
+
+    @Column(name = "and_cooking_time")
+    private Date andCookingTime;
+
+    @Column(name = "close_time")
+    private Date closeTime;
 
 
 }
