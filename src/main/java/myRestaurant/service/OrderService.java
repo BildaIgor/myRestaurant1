@@ -2,7 +2,6 @@ package myRestaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import myRestaurant.converter.DishConverter;
 import myRestaurant.converter.MenuConverter;
 import myRestaurant.converter.OrderConverter;
 import myRestaurant.dto.*;
@@ -10,15 +9,14 @@ import myRestaurant.entity.DishEntity;
 
 import myRestaurant.entity.OrderDishesEntity;
 import myRestaurant.entity.OrderEntity;
+import myRestaurant.entity.WaiterEntity;
 import myRestaurant.repository.*;
 import myRestaurant.utils.DishStatus;
 import myRestaurant.utils.OrderStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,17 +29,23 @@ public class OrderService {
     private final DishRepository dishRepository;
     private final OrderRepository orderRepository;
     private final OrderDishesRepository orderDishesRepository;
+    private final WaiterRepository waiterRepository;
 
     public void createOrder(CreateOrderDto createOrderDto){
-        OrderEntity orderEntity = OrderEntity.builder()
-                .number(createOrderDto.getTableNumber())
-                .timeOfCreation(new Date())
-                .waiterId(createOrderDto.getWaiterId())
-                .orderStatus(OrderStatus.OPENED.getTitle())
-                .build();
-        orderRepository.save(orderEntity);
+        if(orderRepository.getByNumberAndOrderStatus(createOrderDto.getTableNumber(),OrderStatus.OPENED.getTitle()) != null){
+            throw new IllegalArgumentException(String.format("Table with number %s is exist!",createOrderDto.getTableNumber()));
+        } else {
+            OrderEntity orderEntity = OrderEntity.builder()
+                    .number(createOrderDto.getTableNumber())
+                    .timeOfCreation(new Date())
+                    .waiterId(createOrderDto.getWaiterId())
+                    .orderStatus(OrderStatus.OPENED.getTitle())
+                    .build();
+            orderRepository.save(orderEntity);
+        }
     }
     public void addDishesToOrder(AddDishesToOrderDto addDishesToOrderDto){
+
         addDishesToOrderDto.getDishesId().forEach(dishId->orderDishesRepository.save(
                 OrderDishesEntity.builder()
                         .orderId(addDishesToOrderDto.getOrderId())
@@ -55,6 +59,7 @@ public class OrderService {
         OrderEntity orderEntity = orderRepository.getById(addDishesToOrderDto.getOrderId());
         orderEntity.setCheckAmount(orderEntity.getCheckAmount() + sum);
         orderRepository.save(orderEntity);
+
     }
     public List<OrderDto> getOrders(Integer waiterId, Integer orderId){
         List<OrderDto> orderDtos = new ArrayList<>();
@@ -101,6 +106,19 @@ public class OrderService {
        orderDishesRepository.removeById(orderDishesEntity.getId());
        orderEntity.setCheckAmount(orderEntity.getCheckAmount() - dishRepository.getById(dishId).getPrice());
        orderRepository.save(orderEntity);
+    }
+    public void closeOrder(Integer orderId){
+        OrderEntity orderEntity = orderRepository.getById(orderId);
+        orderEntity.setOrderStatus(OrderStatus.CLOSED.getTitle());
+        orderRepository.save(orderEntity);
+        WaiterEntity waiterEntity = waiterRepository.getById(orderEntity.getWaiterId());
+        waiterEntity.setPercentageOfSales(waiterEntity.getPercentageOfSales() + getPercentageOfSalesByOrder(orderId));
+        waiterRepository.save(waiterEntity);
+    }
+    public Double getPercentageOfSalesByOrder(Integer orderId){
+        return orderRepository.getById(orderId).getDishes().stream()
+                .map(x->(double)x.getPercentageOfSales()*x.getPrice() /100)
+                .reduce(0.0,Double::sum);
 
     }
 }

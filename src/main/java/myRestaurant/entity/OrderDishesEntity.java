@@ -37,7 +37,7 @@ public class OrderDishesEntity implements Serializable {
     @Column(name = "start_cooking_time")
     private Date startCookingTime;
 
-    @Column(name = "and_cooking_time")
+    @Column(name = "end_cooking_time")
     private Date andCookingTime;
 
     @Column(name = "close_time")

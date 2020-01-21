@@ -42,6 +42,10 @@ public class OrderController {
                            @RequestParam(name = "dishId") Integer dishId){
         orderService.removeDishFromOrder(orderId, dishId);
     }
+    @PostMapping("/closeOrder")
+    public void closeOrder(@RequestParam(name = "orderId")Integer orderId){
+        orderService.closeOrder(orderId);
+    }
 
 
 }

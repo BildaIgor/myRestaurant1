@@ -36,4 +36,9 @@ public class DishEntity implements Serializable {
     inverseJoinColumns = @JoinColumn(name = "order_id"))
     private List<OrderEntity> orderEntityList;
 
+    @Column(name = "percentage_of_sales")
+    private int percentageOfSales;
+
+
+
 }

@@ -22,7 +22,6 @@ public class AdministratorService {
         cookRepository.save(CookConverter.toCookEntity(cookDto));
     }
     public void deleteWaiter(Integer waiterId){
-
         waiterRepository.delete(waiterRepository.getById(waiterId));
     }
     public void deleteCook(Integer cookId){

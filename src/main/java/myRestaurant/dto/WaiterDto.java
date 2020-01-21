@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 public class WaiterDto {
     private String name;
-    private List<OrderDto> orders;
+    private List<OrderDto> closedOrders;
     private double percentageOfSales;
 
 }
