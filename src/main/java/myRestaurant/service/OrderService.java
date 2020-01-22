@@ -5,11 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import myRestaurant.converter.MenuConverter;
 import myRestaurant.converter.OrderConverter;
 import myRestaurant.dto.*;
-import myRestaurant.entity.DishEntity;
+import myRestaurant.entity.*;
 
-import myRestaurant.entity.OrderDishesEntity;
-import myRestaurant.entity.OrderEntity;
-import myRestaurant.entity.WaiterEntity;
 import myRestaurant.repository.*;
 import myRestaurant.utils.DishStatus;
 import myRestaurant.utils.OrderStatus;
@@ -30,6 +27,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDishesRepository orderDishesRepository;
     private final WaiterRepository waiterRepository;
+    private final DeletedDishesRepository deletedDishesRepository;
 
     public void createOrder(CreateOrderDto createOrderDto){
         if(orderRepository.getByNumberAndOrderStatus(createOrderDto.getTableNumber(),OrderStatus.OPENED.getTitle()) != null){
@@ -100,12 +98,20 @@ public class OrderService {
         }
     }
 
-    public void removeDishFromOrder(Integer orderId, Integer dishId){
+    public void removeDishFromOrder(Integer orderId, Integer dishId, DishStatus dishStatus, String reason){
        OrderEntity orderEntity = orderRepository.getById(orderId);
        OrderDishesEntity orderDishesEntity = orderDishesRepository.getByDishIdAndOrderId(dishId , orderId).get(0);
        orderDishesRepository.removeById(orderDishesEntity.getId());
        orderEntity.setCheckAmount(orderEntity.getCheckAmount() - dishRepository.getById(dishId).getPrice());
        orderRepository.save(orderEntity);
+       deletedDishesRepository.save(DeletedDishesEntity.builder()
+               .order_id(orderDishesEntity.getOrderId())
+               .dish_id(orderDishesEntity.getDishId())
+               .dishStatus(dishStatus.getTitle())
+               .reason(reason)
+               .removalTime(new Date())
+               .build());
+
     }
     public void closeOrder(Integer orderId){
         OrderEntity orderEntity = orderRepository.getById(orderId);
@@ -119,6 +125,5 @@ public class OrderService {
         return orderRepository.getById(orderId).getDishes().stream()
                 .map(x->(double)x.getPercentageOfSales()*x.getPrice() /100)
                 .reduce(0.0,Double::sum);
-
     }
 }

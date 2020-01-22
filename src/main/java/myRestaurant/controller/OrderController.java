@@ -38,9 +38,12 @@ public class OrderController {
     }
 
     @PostMapping("/removeDish")
-    public void removeDish(@RequestParam(name = "orderId") Integer orderId,
-                           @RequestParam(name = "dishId") Integer dishId){
-        orderService.removeDishFromOrder(orderId, dishId);
+    public void removeDish(@RequestBody DeleteDishDto deleteDishDto){
+        orderService.removeDishFromOrder(
+                deleteDishDto.getOrder_id(),
+                deleteDishDto.getDish_id(),
+                deleteDishDto.getDishStatus(),
+                deleteDishDto.getReason());
     }
     @PostMapping("/closeOrder")
     public void closeOrder(@RequestParam(name = "orderId")Integer orderId){
