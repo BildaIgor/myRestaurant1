@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class AddDishesToOrderDto {
-    private int waiterId;
     private int orderId;
     private List<Integer> dishesId;
 }

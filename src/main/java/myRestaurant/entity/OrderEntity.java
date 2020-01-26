@@ -29,8 +29,9 @@ public class OrderEntity implements Serializable {
     @Column(name="creation_time")
     private Date timeOfCreation;
 
-    @Column(name = "waiter_id")
-    private int waiterId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "waiter_id",nullable = false)
+    private WaiterEntity waiter;
 
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(name = "orders_dishes",
@@ -42,6 +43,12 @@ public class OrderEntity implements Serializable {
     private String orderStatus;
 
     @Column(name = "check_amount")
-    private int checkAmount;
+    private double checkAmount;
+
+    @Column(name = "discount")
+    private double discount;
+
+    @Column(name = "paid_time")
+    private Date timeOfPaid;
 
 }

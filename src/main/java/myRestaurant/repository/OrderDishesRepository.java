@@ -12,5 +12,6 @@ public interface OrderDishesRepository extends JpaRepository<OrderDishesEntity, 
     void removeById(int id);
     List<OrderDishesEntity> getAllByDishStatus(String dishStatus);
     OrderDishesEntity getById(int id);
+    List<OrderDishesEntity> getAllByDishStatusAndDishStatus(String dishStatus1, String dishStatus2);
 
 }

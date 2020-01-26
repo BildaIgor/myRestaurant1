@@ -1,5 +1,6 @@
 package myRestaurant.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,11 @@ public class OrderDto {
     private int number;
     private Date timeOfCreation;
     private List<DishDto> dishes;
-    private int waiterId;
+    private WaiterDto waiterDto;
     private OrderStatus orderStatus;
-    private int checkAmount;
+    private double checkAmount;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private double discount;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date timeOfPaid;
 }

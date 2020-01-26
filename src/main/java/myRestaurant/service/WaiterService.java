@@ -17,9 +17,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Slf4j
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+
+
 @Service
 @RequiredArgsConstructor
 public class WaiterService {
@@ -29,9 +33,9 @@ public class WaiterService {
     private final OrderService orderService;
     private final WaiterRepository waiterRepository;
 
-    public Double getPercentageOfSales(Integer waiterId, Integer orderId){
-        if(orderId==null) {
-            List<OrderEntity> orderEntities = orderRepository.getAllByWaiterIdAndOrderStatus(waiterId, OrderStatus.CLOSED.getTitle());
+    public Double getPercentageOfSalesByOrder(Integer waiterId, Integer orderId) {
+        if (orderId == null) {
+            List<OrderEntity> orderEntities = orderRepository.getAllByWaiterIdAndOrderStatus(waiterId, OrderStatus.REPORTED.getTitle());
             return orderEntities.stream()
                     .map(x -> orderService.getPercentageOfSalesByOrder(x.getId()))
                     .reduce(0.0, Double::sum);
@@ -40,58 +44,69 @@ public class WaiterService {
         }
     }
 
-    public List<OrderDto> getClosedOrders(Integer waiterId){
-        return orderService.getOrders(waiterId , null).stream()
-                .filter(x->x.getOrderStatus().equals(OrderStatus.CLOSED))
+    public Double getPercentageOfSalesByTime(Integer waiterId, String dateFrom, String dateTo) {
+        String[] from = dateFrom.split("-");
+        String[] to = dateTo.split("-");
+        Date firstDate = new Date(Integer.parseInt(from[0]) - 1900, Integer.parseInt(from[1]) - 1, Integer.parseInt(from[2]));
+        Date secondDate = new Date(Integer.parseInt(to[0]) - 1900, Integer.parseInt(to[1]) - 1, Integer.parseInt(to[2]));
+        List<OrderEntity> orderEntities = orderRepository.getAllByTimeOfCreationBetweenAndWaiterId(firstDate, secondDate, waiterId);
+        return orderEntities.stream()
+                .map(x -> orderService.getPercentageOfSalesByOrder(x.getId()))
+                .reduce(0.0, Double::sum);
+    }
+
+    public List<OrderDto> getPaidOrders(Integer waiterId) {
+        return orderService.getOrdersByStatus(waiterId, null, OrderStatus.PAID);
+    }
+
+    public Map<MenuDto, Long> getSalesDishesStatistic(Integer waiterId) {
+        List<OrderEntity> orderEntities;
+        if (waiterId != null) {
+            orderEntities = orderRepository.getAllByWaiterIdAndOrderStatus(waiterId, OrderStatus.REPORTED.getTitle());
+        } else {
+            orderEntities = orderRepository.getAllByOrderStatus(OrderStatus.REPORTED.getTitle());
+        }
+        return orderEntities.stream()
+                .flatMap(orderEntity -> orderEntity.getDishes().stream())
+                .map(MenuConverter::toMenuDto)
+                .collect(groupingBy(Function.identity(), counting()));
+    }
+
+//    public List<WaiterDto> getWaiter(Integer waiterId) {
+//        List<WaiterEntity> waiterEntities = new ArrayList<>();
+//        if (waiterId == null) {
+//            waiterEntities = waiterRepository.findAll();
+//        } else {
+//            waiterEntities.add(waiterRepository.getById(waiterId));
+//        }
+//        return waiterEntities.stream().map(waiterEntity ->
+//                WaiterDto.builder()
+//                        .id(waiterEntity.getId())
+//                        .name(waiterEntity.getName())
+//                        .orders(orderService.getOrdersByStatus(waiterEntity.getId(), null, OrderStatus.PAID ))
+//                        .percentageOfSales()
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
+
+    public List<MenuDto> getStopList() {
+        return dishRepository.getAllByQuantityLessThan(10).stream()
+                .map(MenuConverter::toMenuDto)
+                .collect(Collectors.toList());
+
+    }
+
+    public List<MenuDto> getPlayList() {
+        return dishRepository.getAllByQuantity(500).stream()
+                .map(MenuConverter::toMenuDto)
                 .collect(Collectors.toList());
     }
-    public Map<MenuDto, Integer> getSalesDishesStatistic(Integer waiterId){
-        List<OrderEntity> orderEntities;
-        if(waiterId!=null) {
-           orderEntities = orderRepository.getAllByWaiterIdAndOrderStatus(waiterId, OrderStatus.CLOSED.getTitle());
-        } else {
-            orderEntities = orderRepository.getAllByOrderStatus(OrderStatus.CLOSED.getTitle());
-        }
-        Map<MenuDto, Integer> dishesAndQuantity = new HashMap<>();
-        orderEntities.forEach(
-                x->{
-                    x.getDishes().forEach(
-                            a->{
-                                if(!dishesAndQuantity.containsKey(MenuConverter.toMenuDto(a))) {
-                                    dishesAndQuantity.put(MenuConverter.toMenuDto(a), 1);
-                                } else {
-                                    Integer quantity = dishesAndQuantity.get(MenuConverter.toMenuDto(a));
-                                    dishesAndQuantity.put(MenuConverter.toMenuDto(a),quantity+1);
-                                }
-                            }
-                    );
-        }
-        );
 
-        return dishesAndQuantity;
-    }
-    public List<WaiterDto> getWaiters(Integer waiterId){
-        List<WaiterDto> waiterDtos = new ArrayList<>();
-        if(waiterId!=null) {
-            WaiterEntity waiterEntity = waiterRepository.getById(waiterId);
-            waiterDtos.add(WaiterDto.builder()
-                    .name(waiterEntity.getName())
-                    .closedOrders(getClosedOrders(waiterId))
-                    .percentageOfSales(getPercentageOfSales(waiterId,null))
-                    .build());
-        } else {
-            List<WaiterEntity> waiterEntities = waiterRepository.findAll();
-            waiterEntities.forEach(
-                    x->{
-                        waiterDtos.add(WaiterDto.builder()
-                        .name(x.getName())
-                        .closedOrders(getClosedOrders(x.getId()))
-                        .percentageOfSales(getPercentageOfSales(x.getId(), null))
-                        .build());
-                    }
-            );
-        }
-        return waiterDtos;
+    public List<MenuDto> getNormalList() {
+        return dishRepository.getAllByQuantity(100).stream()
+                .map(MenuConverter::toMenuDto)
+                .collect(Collectors.toList());
+
     }
 
 

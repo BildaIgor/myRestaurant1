@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Builder
@@ -23,7 +24,8 @@ public class WaiterEntity implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "percentage_of_sales")
-    private double percentageOfSales;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "waiter")
+    private List<OrderEntity> orders;
 
 }

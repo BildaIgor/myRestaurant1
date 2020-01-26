@@ -3,10 +3,9 @@ package myRestaurant.controller;
 import lombok.RequiredArgsConstructor;
 import myRestaurant.dto.*;
 import myRestaurant.service.OrderService;
+import myRestaurant.utils.OrderStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Transient;
-import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController
@@ -25,11 +24,12 @@ public class OrderController {
                                  ){
         orderService.addDishesToOrder(addDishesToOrderDto);
     }
-    @GetMapping("/{waiterId}/getOrders")
-    public List<OrderDto> getOrders(@PathVariable(name = "waiterId") Integer waiterId,
-                                    @RequestParam(name = "orderId", required = false) Integer orderId
-    ){
-        return orderService.getOrders(waiterId,orderId);
+    @GetMapping("/getOrders")
+    public List<OrderDto> getOrders(@RequestParam(name = "waiterId",required = false) Integer waiterId,
+                                    @RequestParam(name = "orderId", required = false) Integer orderId,
+                                    @RequestParam(name = "orderStatus") String orderStatus
+                                    ){
+        return orderService.getOrdersByStatus(waiterId,orderId,OrderStatus.valueOf(orderStatus));
     }
     @GetMapping("/getDishesInMenu")
     public List<MenuDto> getDishesInMenuByCategory(@RequestParam(name = "column") String column,
@@ -39,15 +39,30 @@ public class OrderController {
 
     @PostMapping("/removeDish")
     public void removeDish(@RequestBody DeleteDishDto deleteDishDto){
-        orderService.removeDishFromOrder(
-                deleteDishDto.getOrder_id(),
-                deleteDishDto.getDish_id(),
-                deleteDishDto.getDishStatus(),
-                deleteDishDto.getReason());
+        orderService.removeDishFromOrder(deleteDishDto);
+
     }
     @PostMapping("/closeOrder")
     public void closeOrder(@RequestParam(name = "orderId")Integer orderId){
         orderService.closeOrder(orderId);
+    }
+
+    @PostMapping("/closeDish")
+    public void closeDish(@RequestParam(name = "orderDishId")Integer orderDishId){
+        orderService.closeDish(orderDishId);
+    }
+
+
+
+    @PostMapping("/changeNumber")
+    public void changeNumber(@RequestParam(name = "orderId") Integer orderId,
+                             @RequestParam(name = "number") Integer number){
+        orderService.changeNumber(orderId,number);
+    }
+    @PostMapping("/changeWaiter")
+    public void changeWaiter(@RequestParam("orderId") Integer orderId,
+                             @RequestParam("waiterId") Integer waiterId){
+        orderService.changeWaiter(orderId,waiterId);
     }
 
 

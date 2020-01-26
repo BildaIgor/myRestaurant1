@@ -28,7 +28,7 @@ public class DishEntity implements Serializable {
     private String name;
 
     @Column(name="price")
-    private int price;
+    private double price;
 
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(name = "orders_dishes",
@@ -38,6 +38,9 @@ public class DishEntity implements Serializable {
 
     @Column(name = "percentage_of_sales")
     private int percentageOfSales;
+
+    @Column(name = "quantity")
+    private int quantity;
 
 
 

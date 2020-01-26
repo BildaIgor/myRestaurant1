@@ -2,7 +2,10 @@ package myRestaurant.utils;
 
 public enum OrderStatus {
     OPENED ("OPENED"),
-    CLOSED("CLOSED");
+    CLOSED("CLOSED"),
+    PAID("PAID"),
+    READY_FOR_REPORTED("READY_FOR_REPORTED"),
+    REPORTED("REPORTED");
     private String title;
 
     OrderStatus(String title){

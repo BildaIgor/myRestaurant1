@@ -11,8 +11,7 @@ import myRestaurant.utils.DishStatus;
 @AllArgsConstructor
 @Builder
 public class DeleteDishDto {
-    private int order_id;
-    private int dish_id;
+    private int orderDishId;
     private DishStatus dishStatus;
     private String reason;
 }

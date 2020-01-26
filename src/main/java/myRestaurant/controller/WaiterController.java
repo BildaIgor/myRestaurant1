@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.Column;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 import java.util.Map;
 
@@ -23,21 +21,48 @@ public class WaiterController {
     @GetMapping("/getTotalPercentageOfSales")
     public Double getPercentageOfSales(@RequestParam(name = "waiterId") Integer waiterId,
                                        @RequestParam(name = "orderId",required = false) Integer orderId){
-        return waiterService.getPercentageOfSales(waiterId,orderId);
+        return waiterService.getPercentageOfSalesByOrder(waiterId,orderId);
+    }
+
+    @GetMapping("/getTotalPercentageOfSalesByTime")
+    public Double getPercentageOfSales(@RequestParam(name = "waiterId") Integer waiterId,
+                                       @RequestParam(name = "dateFrom") String dateForm,
+                                       @RequestParam(name = "dateTo") String dateTo) {
+
+        return waiterService.getPercentageOfSalesByTime(waiterId, dateForm , dateTo);
+
     }
 
     @GetMapping("/getClosedOrders")
     public List<OrderDto> getClosedOrders(@RequestParam(name = "waiterId") Integer waiterId){
-         return waiterService.getClosedOrders(waiterId);
+         return waiterService.getPaidOrders(waiterId);
     }
 
     @GetMapping("/getSalesDishesStatistic")
-    public Map<MenuDto, Integer> getSalesDishesStatistic(@RequestParam(name = "waiterId",required = false) Integer waiterId){
+    public Map<MenuDto, Long> getSalesDishesStatistic(@RequestParam(name = "waiterId",required = false) Integer waiterId){
         return waiterService.getSalesDishesStatistic(waiterId);
     }
-    @GetMapping("/getWaiters")
-    public List<WaiterDto> getWaiters(@RequestParam(name = "waiterId",required = false)Integer waiterId){
-        return waiterService.getWaiters(waiterId);
+//    @GetMapping("/getWaiters")
+//    public List<WaiterDto> getWaiters(@RequestParam(name = "waiterId",required = false)Integer waiterId){
+//        return waiterService.getWaiter(waiterId);
+//    }
+    @GetMapping("/getStopList")
+    public List<MenuDto> getStopList(){
+        return waiterService.getStopList();
     }
+    @GetMapping("/getPlayList")
+    public List<MenuDto> getPlayList(){
+        return waiterService.getPlayList();
+    }
+    @GetMapping("/getNormalList")
+    public List<MenuDto> getNormalList(){
+        return waiterService.getNormalList();
+    }
+
+
+
+
+
+
 
 }

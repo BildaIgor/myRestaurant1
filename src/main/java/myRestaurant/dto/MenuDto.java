@@ -13,5 +13,7 @@ public class MenuDto {
     private int id;
     private String category;
     private String name;
-    private int price;
+    private double price;
+    private int percentageOfSales;
+
 }

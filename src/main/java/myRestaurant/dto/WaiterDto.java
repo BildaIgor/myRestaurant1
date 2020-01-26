@@ -1,5 +1,6 @@
 package myRestaurant.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +15,12 @@ import java.util.List;
 @Component
 @Builder
 public class WaiterDto {
+    private int id;
     private String name;
-    private List<OrderDto> closedOrders;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<OrderDto> orders;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private double percentageOfSales;
+
 
 }

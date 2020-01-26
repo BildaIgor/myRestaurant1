@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import myRestaurant.converter.CookConverter;
 import myRestaurant.converter.DishConverter;
 import myRestaurant.converter.MenuConverter;
-import myRestaurant.dto.CookDishDto;
+
 import myRestaurant.dto.CookDto;
 import myRestaurant.dto.DishDto;
 import myRestaurant.dto.MenuDto;
@@ -29,43 +29,57 @@ public class CookService {
     private final CookRepository cookRepository;
     private final OrderDishesRepository orderDishesRepository;
 
-    public List<CookDishDto> getNewDishes(){
-//        List<DishEntity> dishEntities = ord.getAllByDishStatus(DishStatus.NEW.getTitle());
-//        return dishEntities.stream()
-//                .map(DishConverter :: toDishDTO)
-//                .collect(Collectors.toList());
-        List<OrderDishesEntity> orderDishesEntities = orderDishesRepository.getAllByDishStatus(DishStatus.NEW.getTitle());
-       List<CookDishDto> cookDishDtos = new ArrayList<>();
-       orderDishesEntities.forEach(
-               x->{
-                   DishEntity dishEntity = dishRepository.getById(x.getDishId());
-                   cookDishDtos.add(CookDishDto.builder()
-                   .id(x.getId())
-                   .category(dishEntity.getCategory())
-                   .name(dishEntity.getName())
-                   .build());
-               }
-       );
-       return cookDishDtos;
+    public List<DishDto> getDishesByCategoryAndDishStatus(String category, DishStatus dishStatus) {
+        List<OrderDishesEntity> orderDishesEntities = orderDishesRepository.getAllByDishStatusAndDishStatus(DishStatus.NEW.getTitle(), DishStatus.IN_COOKING.getTitle());
+        List<DishDto> dishDtos = new ArrayList<>();
+        orderDishesEntities.forEach(
+                x -> {
+                    DishEntity dishEntity = dishRepository.getById(x.getDishId());
+                    dishDtos.add(DishDto.builder()
+                            .id(dishEntity.getId())
+                            .orderDishId(x.getId())
+                            .category(dishEntity.getCategory())
+                            .name(dishEntity.getName())
+                            .price(dishEntity.getPrice())
+                            .dishStatus(DishStatus.valueOf(x.getDishStatus()))
+                            .build());
+                }
+        );
+        if (category != null) {
+            return dishDtos.stream()
+                    .filter(x -> x.getCategory().equals(category))
+                    .filter(x -> x.getDishStatus().equals(dishStatus))
+                    .collect(Collectors.toList());
+        } else {
+            return dishDtos.stream()
+                    .filter(x -> x.getDishStatus().equals(dishStatus))
+                    .collect(Collectors.toList());
+        }
     }
-    public void startCooking(Integer id){
-       OrderDishesEntity orderDishesEntity = orderDishesRepository.getById(id);
-       orderDishesEntity.setDishStatus(DishStatus.IN_COOKING.getTitle());
-       orderDishesEntity.setStartCookingTime(new Date());
-       orderDishesRepository.save(orderDishesEntity);
+
+    public void startCooking(Integer orderDishId) {
+        OrderDishesEntity orderDishesEntity = orderDishesRepository.getById(orderDishId);
+        if(orderDishesEntity.getDishStatus().equals(DishStatus.NEW.getTitle())) {
+            orderDishesEntity.setDishStatus(DishStatus.IN_COOKING.getTitle());
+            orderDishesEntity.setStartCookingTime(new Date());
+            orderDishesRepository.save(orderDishesEntity);
+        } else throw new IllegalArgumentException(String.format("Dish with orderDishId: %s not a new!",orderDishesEntity.getId()));
     }
-    public void endCooking(Integer id){
-        OrderDishesEntity orderDishesEntity = orderDishesRepository.getById(id);
-        orderDishesEntity.setDishStatus(DishStatus.COOKED.getTitle());
-        orderDishesEntity.setAndCookingTime(new Date());
-        orderDishesRepository.save(orderDishesEntity);
+
+    public void endCooking(Integer orderDishId) {
+        OrderDishesEntity orderDishesEntity = orderDishesRepository.getById(orderDishId);
+        if(orderDishesEntity.getDishStatus().equals(DishStatus.COOKED.getTitle())) {
+            orderDishesEntity.setDishStatus(DishStatus.COOKED.getTitle());
+            orderDishesEntity.setAndCookingTime(new Date());
+            orderDishesRepository.save(orderDishesEntity);
+        } else throw new IllegalArgumentException(String.format("Dish with orderDishId: %s not a IN_COOKED",orderDishesEntity.getId()));
     }
-    public void setCookingTime(Integer cookId, Integer cookingTime){
+
+    public void setCookingTime(Integer cookId, Integer cookingTime) {
         CookEntity cookEntity = cookRepository.getById(cookId);
         cookEntity.setCookingTime(cookingTime);
         cookRepository.save(cookEntity);
-
     }
-    
+
 
 }

@@ -6,14 +6,15 @@ import myRestaurant.entity.WaiterEntity;
 public class WaiterConverter {
     public static WaiterDto toWaiterDto(WaiterEntity waiterEntity){
         return WaiterDto.builder()
+                .id(waiterEntity.getId())
                 .name(waiterEntity.getName())
-                .percentageOfSales(waiterEntity.getPercentageOfSales())
+
                 .build();
     }
     public static WaiterEntity toWaiterEntity(WaiterDto waiterDto){
         return WaiterEntity.builder()
                 .name(waiterDto.getName())
-                .percentageOfSales(waiterDto.getPercentageOfSales())
+
                 .build();
     }
 }
