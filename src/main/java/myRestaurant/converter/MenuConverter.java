@@ -1,15 +1,15 @@
 package myRestaurant.converter;
 
 import myRestaurant.dto.MenuDto;
-import myRestaurant.entity.DishEntity;
+import myRestaurant.entity.Dish;
 
 public class MenuConverter {
-    public static MenuDto toMenuDto(DishEntity dishEntity){
+    public static MenuDto toMenuDto(Dish dish){
         return MenuDto.builder()
-                .id(dishEntity.getId())
-                .category(dishEntity.getCategory())
-                .name(dishEntity.getName())
-                .price(dishEntity.getPrice())
+                .id(dish.getId())
+                .category(dish.getCategory())
+                .name(dish.getName())
+                .price(dish.getPrice())
                 .build();
     }
 }

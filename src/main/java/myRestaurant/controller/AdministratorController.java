@@ -2,15 +2,9 @@ package myRestaurant.controller;
 
 import lombok.RequiredArgsConstructor;
 import myRestaurant.dto.CookDto;
-import myRestaurant.dto.OrderDto;
 import myRestaurant.dto.WaiterDto;
-import myRestaurant.entity.DishEntity;
-import myRestaurant.entity.OrderEntity;
 import myRestaurant.service.AdministratorService;
-import myRestaurant.utils.OrderStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController

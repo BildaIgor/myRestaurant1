@@ -1,14 +1,11 @@
 package myRestaurant.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import myRestaurant.dto.ReportDto;
-import myRestaurant.entity.OrderEntity;
-import myRestaurant.entity.WaiterEntity;
+import myRestaurant.entity.Order;
 import myRestaurant.repository.OrderRepository;
 import myRestaurant.utils.OrderStatus;
 import org.springframework.stereotype.Service;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,26 +20,26 @@ public class CashierService {
     private final WaiterService waiterService;
 
     public void payOrder(Integer orderId) {
-        OrderEntity orderEntity = orderRepository.getById(orderId);
-        if (orderEntity.getOrderStatus().equals(OrderStatus.CLOSED.getTitle())) {
-            orderEntity.setOrderStatus(OrderStatus.PAID.getTitle());
-            orderEntity.setTimeOfPaid(new Date());
-            orderRepository.save(orderEntity);
+        Order order = orderRepository.getById(orderId);
+        if (order.getOrderStatus().equals(OrderStatus.CLOSED.getTitle())) {
+            order.setOrderStatus(OrderStatus.PAID.getTitle());
+            order.setTimeOfPaid(new Date());
+            orderRepository.save(order);
         } else
-            throw new IllegalArgumentException(String.format("Order with number: %s does not closed!", orderEntity.getNumber()));
+            throw new IllegalArgumentException(String.format("Order with number: %s does not closed!", order.getNumber()));
 
     }
 
     public ReportDto getReport(){
-        List<OrderEntity> orderEntities =  orderRepository.getAllByOrderStatus(OrderStatus.READY_FOR_REPORTED.getTitle());
+        List<Order> orderEntities =  orderRepository.getAllByOrderStatus(OrderStatus.READY_FOR_REPORTED.getTitle());
         Optional<Date> from = orderEntities.stream()
-                .map(OrderEntity::getTimeOfCreation)
+                .map(Order::getTimeOfCreation)
                 .min(Date::compareTo);
         Optional<Date> to = orderEntities.stream()
-                .map(OrderEntity::getTimeOfPaid)
+                .map(Order::getTimeOfPaid)
                 .max(Date::compareTo);
         Optional<Double> sum = orderEntities.stream()
-                .map(OrderEntity::getCheckAmount)
+                .map(Order::getCheckAmount)
                 .reduce(Double :: sum);
         Optional<Double> sumOfPercentage = orderEntities.stream()
                 .map(x->orderService.getPercentageOfSalesByOrder(x.getId()))

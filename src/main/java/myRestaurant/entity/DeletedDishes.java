@@ -14,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="deleted_dishes")
-public class DeletedDishesEntity {
+public class DeletedDishes {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")

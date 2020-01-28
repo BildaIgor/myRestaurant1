@@ -1,20 +1,18 @@
 package myRestaurant.converter;
 
 import myRestaurant.dto.WaiterDto;
-import myRestaurant.entity.WaiterEntity;
+import myRestaurant.entity.Waiter;
 
 public class WaiterConverter {
-    public static WaiterDto toWaiterDto(WaiterEntity waiterEntity){
+    public static WaiterDto toWaiterDto(Waiter waiter){
         return WaiterDto.builder()
-                .id(waiterEntity.getId())
-                .name(waiterEntity.getName())
-
+                .id(waiter.getId())
+                .name(waiter.getName())
                 .build();
     }
-    public static WaiterEntity toWaiterEntity(WaiterDto waiterDto){
-        return WaiterEntity.builder()
+    public static Waiter toWaiterEntity(WaiterDto waiterDto){
+        return Waiter.builder()
                 .name(waiterDto.getName())
-
                 .build();
     }
 }

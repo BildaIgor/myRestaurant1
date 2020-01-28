@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="dish")
-public class DishEntity implements Serializable {
+public class Dish implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -34,7 +34,7 @@ public class DishEntity implements Serializable {
     @JoinTable(name = "orders_dishes",
     joinColumns = @JoinColumn(name = "dish_id"),
     inverseJoinColumns = @JoinColumn(name = "order_id"))
-    private List<OrderEntity> orderEntityList;
+    private List<Order> orderList;
 
     @Column(name = "percentage_of_sales")
     private int percentageOfSales;

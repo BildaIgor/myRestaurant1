@@ -5,6 +5,7 @@ import myRestaurant.dto.MenuDto;
 import myRestaurant.dto.OrderDto;
 import myRestaurant.dto.WaiterDto;
 import myRestaurant.service.WaiterService;
+import myRestaurant.utils.OrderStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,7 +31,6 @@ public class WaiterController {
                                        @RequestParam(name = "dateTo") String dateTo) {
 
         return waiterService.getPercentageOfSalesByTime(waiterId, dateForm , dateTo);
-
     }
 
     @GetMapping("/getClosedOrders")
@@ -42,10 +42,11 @@ public class WaiterController {
     public Map<MenuDto, Long> getSalesDishesStatistic(@RequestParam(name = "waiterId",required = false) Integer waiterId){
         return waiterService.getSalesDishesStatistic(waiterId);
     }
-//    @GetMapping("/getWaiters")
-//    public List<WaiterDto> getWaiters(@RequestParam(name = "waiterId",required = false)Integer waiterId){
-//        return waiterService.getWaiter(waiterId);
-//    }
+    @GetMapping("/getWaiters")
+    public List<WaiterDto> getWaiters(@RequestParam(name = "waiterId",required = false)Integer waiterId,
+                                      @RequestParam(name = "orderStatus") String orderStatus){
+        return waiterService.getWaiter(waiterId, OrderStatus.valueOf(orderStatus));
+    }
     @GetMapping("/getStopList")
     public List<MenuDto> getStopList(){
         return waiterService.getStopList();

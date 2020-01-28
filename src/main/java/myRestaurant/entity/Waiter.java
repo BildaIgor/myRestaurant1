@@ -7,14 +7,15 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="cook")
-public class CookEntity implements Serializable {
+@Table(name="waiter")
+public class Waiter implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -23,9 +24,7 @@ public class CookEntity implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "position")
-    private String position;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "waiter")
+    private List<Order> orders;
 
-    @Column(name = "cooking_time")
-    private int cookingTime;
 }

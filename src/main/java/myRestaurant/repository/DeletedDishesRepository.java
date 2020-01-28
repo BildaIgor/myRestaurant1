@@ -1,7 +1,7 @@
 package myRestaurant.repository;
 
-import myRestaurant.entity.DeletedDishesEntity;
+import myRestaurant.entity.DeletedDishes;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DeletedDishesRepository extends JpaRepository<DeletedDishesEntity, Integer> {
+public interface DeletedDishesRepository extends JpaRepository<DeletedDishes, Integer> {
 }

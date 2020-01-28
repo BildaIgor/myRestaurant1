@@ -6,19 +6,13 @@ import myRestaurant.converter.WaiterConverter;
 import myRestaurant.dto.CookDto;
 import myRestaurant.dto.OrderDto;
 import myRestaurant.dto.WaiterDto;
-import myRestaurant.entity.CookEntity;
-import myRestaurant.entity.DishEntity;
-import myRestaurant.entity.OrderEntity;
+import myRestaurant.entity.Dish;
+import myRestaurant.entity.Order;
 import myRestaurant.repository.*;
 import myRestaurant.utils.OrderStatus;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,39 +40,39 @@ public class AdministratorService {
     }
 
     public void addDishInPlayList(Integer dishId){
-        DishEntity dishEntity = dishRepository.getById(dishId);
-        dishEntity.setQuantity(500);
-        dishRepository.save(dishEntity);
+        Dish dish = dishRepository.getById(dishId);
+        dish.setQuantity(500);
+        dishRepository.save(dish);
     }
     public void addDishInStopList(Integer dishId, Integer balance){
-        DishEntity dishEntity = dishRepository.getById(dishId);
-        dishEntity.setQuantity(balance);
-        dishRepository.save(dishEntity);
+        Dish dish = dishRepository.getById(dishId);
+        dish.setQuantity(balance);
+        dishRepository.save(dish);
     }
     public void setNormalQuantity(Integer dishId){
-        DishEntity dishEntity = dishRepository.getById(dishId);
-        dishEntity.setQuantity(100);
-        dishRepository.save(dishEntity);
+        Dish dish = dishRepository.getById(dishId);
+        dish.setQuantity(100);
+        dishRepository.save(dish);
     }
     public void makeDiscount(Integer orderId, Double discount){
-        OrderEntity orderEntity = orderRepository.getById(orderId);
-        if(orderEntity.getOrderStatus().equals(OrderStatus.OPENED.getTitle())) {
-            orderEntity.setDiscount(discount);
-            orderEntity.setCheckAmount(orderEntity.getCheckAmount() - orderEntity.getCheckAmount() * (discount / 100));
-            orderRepository.save(orderEntity);
+        Order order = orderRepository.getById(orderId);
+        if(order.getOrderStatus().equals(OrderStatus.OPENED.getTitle())) {
+            order.setDiscount(discount);
+            order.setCheckAmount(order.getCheckAmount() - order.getCheckAmount() * (discount / 100));
+            orderRepository.save(order);
         } else throw new IllegalArgumentException("Order is closed");
     }
     public void deleteDiscount(Integer orderId){
-        OrderEntity orderEntity = orderRepository.getById(orderId);
-        if(orderEntity.getOrderStatus().equals(OrderStatus.OPENED.getTitle())) {
-            orderEntity.setCheckAmount(orderEntity.getCheckAmount() / (1.0 - (orderEntity.getDiscount() / 100)));
-            orderEntity.setDiscount(1);
-            orderRepository.save(orderEntity);
+        Order order = orderRepository.getById(orderId);
+        if(order.getOrderStatus().equals(OrderStatus.OPENED.getTitle())) {
+            order.setCheckAmount(order.getCheckAmount() / (1.0 - (order.getDiscount() / 100)));
+            order.setDiscount(1);
+            orderRepository.save(order);
         } else throw new IllegalArgumentException("Order is closed");
     }
     public void closeDay(){
 
-        List<OrderEntity> orderEntities = orderRepository.getAllByOrderStatus(OrderStatus.PAID.getTitle());
+        List<Order> orderEntities = orderRepository.getAllByOrderStatus(OrderStatus.PAID.getTitle());
         orderRepository.saveAll(orderEntities.stream()
                 .peek(x -> x.setOrderStatus(OrderStatus.READY_FOR_REPORTED.getTitle()))
                 .collect(Collectors.toList()));
