@@ -27,7 +27,7 @@ public class CookService {
         List<DishDto> dishDtos = new ArrayList<>();
         orderDishesEntities.forEach(
                 x -> {
-                    Dish dish = dishRepository.getById(x.getDishId());
+                    Dish dish = dishRepository.getById(x.getDish().getId());
                     dishDtos.add(DishDto.builder()
                             .id(dish.getId())
                             .orderDishId(x.getId())

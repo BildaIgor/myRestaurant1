@@ -80,15 +80,15 @@ public class AdministratorService {
 
     public Map<String, Double> getCashbox() {
         Map<String, Double> map = new HashMap<>();
-        map.put("Cash from OPENED orders", orderService.getOrdersByStatus(null, null, OrderStatus.OPENED).stream()
+        map.put("Cash from OPENED orders", orderService.getOrdersByStatus(OrderStatus.OPENED).stream()
                 .map(OrderDto::getCheckAmount)
                 .reduce(0.0, Double::sum)
         );
-        map.put("Cash from CLOSED orders", orderService.getOrdersByStatus(null, null, OrderStatus.CLOSED).stream()
+        map.put("Cash from CLOSED orders", orderService.getOrdersByStatus(OrderStatus.CLOSED).stream()
                 .map(OrderDto::getCheckAmount)
                 .reduce(0.0, Double::sum)
         );
-        map.put("Cash from PAID orders", orderService.getOrdersByStatus(null, null, OrderStatus.PAID).stream()
+        map.put("Cash from PAID orders", orderService.getOrdersByStatus(OrderStatus.PAID).stream()
                 .map(OrderDto::getCheckAmount)
                 .reduce(0.0, Double::sum)
         );

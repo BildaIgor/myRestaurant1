@@ -1,3 +1,4 @@
+
 package myRestaurant.converter;
 
 import myRestaurant.dto.DishDto;
@@ -9,21 +10,14 @@ import myRestaurant.utils.OrderStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderConverter {
-    public static OrderDto toOrderDTO(Order order, List<OrderDishes> orderDishesEntities){
-        List<DishDto> dishDtos = new ArrayList<>();
-        for (int i = 0; i < order.getDishes().size() ; i++) {
-            dishDtos.add(DishDto.builder()
-                    .id(order.getDishes().get(i).getId())
-                    .orderDishId(orderDishesEntities.get(i).getId())
-                    .category(order.getDishes().get(i).getCategory())
-                    .name(order.getDishes().get(i).getName())
-                    .price(order.getDishes().get(i).getPrice())
-                    .dishStatus(DishStatus.valueOf(orderDishesEntities.get(i).getDishStatus()))
-                    .build()
-            );
-        }
+    public static OrderDto toOrderDTO(Order order){
+        List<DishDto> dishDtos = order.getOrderDishes().stream()
+                .map(DishConverter::toDto)
+                .collect(Collectors.toList());
+
         return OrderDto.builder()
                 .id(order.getId())
                 .number(order.getNumber())
@@ -37,3 +31,4 @@ public class OrderConverter {
                 .build();
     }
 }
+

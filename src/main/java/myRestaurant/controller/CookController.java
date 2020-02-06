@@ -15,11 +15,13 @@ import java.util.List;
 public class CookController {
     private final CookService cookService;
 
+
     @GetMapping("/getNewDishes")
     public List<DishDto> getNewDishes(@RequestParam(name = "category",required = false) String category,
                                       @RequestParam(name = "dishStatus") String dishStatus){
         return cookService.getDishesByCategoryAndDishStatus(category, DishStatus.valueOf(dishStatus));
     }
+
 
     @PostMapping("/startCooking")
     public void startCooking(@RequestParam(name = "dishId") Integer dishId){

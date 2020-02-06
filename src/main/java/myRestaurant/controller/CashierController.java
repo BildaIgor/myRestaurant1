@@ -16,8 +16,8 @@ public class CashierController {
         cashierService.payOrder(orderId);
     }
 
-    @GetMapping("/getReport")
-    public ReportDto getReport(){
-        return cashierService.getReport();
-    }
+//    @GetMapping("/getReport")
+//    public ReportDto getReport(){
+//        return cashierService.getReport();
+//    }
 }

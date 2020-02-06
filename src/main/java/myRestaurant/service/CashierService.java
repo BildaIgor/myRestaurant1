@@ -30,35 +30,35 @@ public class CashierService {
 
     }
 
-    public ReportDto getReport(){
-        List<Order> orderEntities =  orderRepository.getAllByOrderStatus(OrderStatus.READY_FOR_REPORTED.getTitle());
-        Optional<Date> from = orderEntities.stream()
-                .map(Order::getTimeOfCreation)
-                .min(Date::compareTo);
-        Optional<Date> to = orderEntities.stream()
-                .map(Order::getTimeOfPaid)
-                .max(Date::compareTo);
-        Optional<Double> sum = orderEntities.stream()
-                .map(Order::getCheckAmount)
-                .reduce(Double :: sum);
-        Optional<Double> sumOfPercentage = orderEntities.stream()
-                .map(x->orderService.getPercentageOfSalesByOrder(x.getId()))
-                .reduce(Double :: sum);
-
-        orderRepository.saveAll(orderEntities.stream()
-        .peek(x->x.setOrderStatus(OrderStatus.REPORTED.getTitle()))
-        .collect(Collectors.toList()));
-
-
-        return ReportDto.builder()
-                .id(1)
-                .from(from.get())
-                .to(to.get())
-                .cashierName("VASIA")
-                .paidOrders(orderService.getOrdersByStatus(null,null,OrderStatus.READY_FOR_REPORTED))
-                .paidDishes(waiterService.getSalesDishesStatistic(null))
-                .sumCash(sum.get())
-                .sumPercentageOfSales(sumOfPercentage.get())
-                .build();
-    }
+//    public ReportDto getReport(){
+//        List<Order> orderEntities =  orderRepository.getAllByOrderStatus(OrderStatus.READY_FOR_REPORTED.getTitle());
+//        Optional<Date> from = orderEntities.stream()
+//                .map(Order::getTimeOfCreation)
+//                .min(Date::compareTo);
+//        Optional<Date> to = orderEntities.stream()
+//                .map(Order::getTimeOfPaid)
+//                .max(Date::compareTo);
+//        Optional<Double> sum = orderEntities.stream()
+//                .map(Order::getCheckAmount)
+//                .reduce(Double :: sum);
+//        Optional<Double> sumOfPercentage = orderEntities.stream()
+//                .map(x->orderService.getPercentageOfSalesByOrder(x.getId()))
+//                .reduce(Double :: sum);
+//
+//        orderRepository.saveAll(orderEntities.stream()
+//        .peek(x->x.setOrderStatus(OrderStatus.REPORTED.getTitle()))
+//        .collect(Collectors.toList()));
+//
+//
+//        return ReportDto.builder()
+//                .id(1)
+//                .from(from.get())
+//                .to(to.get())
+//                .cashierName("VASIA")
+//                .paidOrders(orderService.getOrdersByStatus(null,null,OrderStatus.READY_FOR_REPORTED))
+//                .paidDishes(waiterService.getSalesDishesStatistic(null))
+//                .sumCash(sum.get())
+//                .sumPercentageOfSales(sumOfPercentage.get())
+//                .build();
+//    }
 }

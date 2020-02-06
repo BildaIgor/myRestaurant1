@@ -60,10 +60,5 @@ public class WaiterController {
         return waiterService.getNormalList();
     }
 
-
-
-
-
-
-
 }
+

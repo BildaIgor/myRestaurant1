@@ -2,17 +2,24 @@ package myRestaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import myRestaurant.converter.MenuConverter;
+//import myRestaurant.converter.OrderConverter;
 import myRestaurant.converter.OrderConverter;
 import myRestaurant.dto.*;
 import myRestaurant.entity.*;
 import myRestaurant.repository.*;
 import myRestaurant.utils.DishStatus;
 import myRestaurant.utils.OrderStatus;
+import myRestaurant.utils.RemainderDishStatus;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static myRestaurant.utils.RemainderDishStatus.*;
 
 
 @Service
@@ -28,7 +35,7 @@ public class OrderService {
 
     public void createOrder(CreateOrderDto createOrderDto) {
         if (orderRepository.getByNumberAndOrderStatus(createOrderDto.getTableNumber(), OrderStatus.OPENED.getTitle()) != null) {
-            throw new IllegalArgumentException(String.format("Table with number %s is exist!", createOrderDto.getTableNumber()));
+            throw new IllegalArgumentException(String.format("Order with table number %s is already exist!", createOrderDto.getTableNumber()));
         } else {
             Order order = Order.builder()
                     .number(createOrderDto.getTableNumber())
@@ -41,57 +48,58 @@ public class OrderService {
     }
 
     public void addDishesToOrder(AddDishesToOrderDto addDishesToOrderDto) {
-
-        if(orderRepository.getById(addDishesToOrderDto.getOrderId()).getOrderStatus().equals(OrderStatus.CLOSED.getTitle())){
+        Order order = orderRepository.getById(addDishesToOrderDto.getOrderId());
+        if (!order.getOrderStatus().equals(OrderStatus.OPENED.getTitle())) {
             throw new IllegalArgumentException("This order is closed!");
         }
-        addDishesToOrderDto.getDishesId().forEach(dishId -> {
-            if (dishRepository.getById(dishId).getQuantity() < 10 && dishRepository.getById(dishId).getQuantity() > 0 ||
-                    dishRepository.getById(dishId).getQuantity() == 500 ||
-                    dishRepository.getById(dishId).getQuantity() == 100) {
-                orderDishesRepository.save(
-                        OrderDishes.builder()
-                                .orderId(addDishesToOrderDto.getOrderId())
-                                .dishId(dishId)
-                                .dishStatus(DishStatus.NEW.getTitle())
-                                .addTime(new Date())
-                                .build());
-
-            } else {
-                throw new IllegalArgumentException(String.format("Dish with id: %s does not exist! Quantity : 0", dishId));
-            }
-            if (dishRepository.getById(dishId).getQuantity() < 10 && dishRepository.getById(dishId).getQuantity() > 0) {
-                Dish dish = dishRepository.getById(dishId);
-                dish.setQuantity(dish.getQuantity() - 1);
-                dishRepository.save(dish);
-            }
-        });
-        Double sum = addDishesToOrderDto.getDishesId().stream()
-                .map(x -> dishRepository.getById(x).getPrice())
-                .reduce(0.0, Double::sum);
-        Order order = orderRepository.getById(addDishesToOrderDto.getOrderId());
-        order.setCheckAmount(order.getCheckAmount() + sum);
+        List<OrderDishes> orderDishes = order.getOrderDishes();
+        orderDishes.addAll(addDishesToOrderDto.getDishesId().stream()
+                .peek(this::changeDishQuantity)
+                .map(dishId -> OrderDishes.builder()
+                        .order(order)
+                        .addTime(new Date())
+                        .dishStatus(DishStatus.NEW.getTitle())
+                        .dish(dishRepository.getById(dishId))
+                        .build())
+                .collect(Collectors.toList()));
+        order.setOrderDishes(orderDishes);
+        order.setCheckAmount(countCheckAmount(order.getOrderDishes()));
         orderRepository.save(order);
-
-
+    }
+    public double countCheckAmount(List<OrderDishes> orderDishes){
+        return orderDishes.stream()
+                .map(OrderDishes::getDish)
+                .map(Dish::getPrice)
+                .reduce(0.0, Double::sum);
+    }
+    public void changeDishQuantity(int dishId) {
+        Dish dish = dishRepository.getById(dishId);
+        if (checkDishQuantity(dish).equals(STOP_LIST)) {
+            throw new IllegalArgumentException(String.format("Dish with id: %s on a stop-list!", dish.getId()));
+        } else if (dish.getQuantity() != PLAY_LIST.getQuantity() &&
+                dish.getQuantity() != NORMAL.getQuantity()) {
+            dish.setQuantity(dish.getQuantity() - 1);
+            dishRepository.save(dish);
+        }
+    }
+    public RemainderDishStatus checkDishQuantity(Dish dish){
+        int dishQuantity = dish.getQuantity();
+        if(dishQuantity == STOP_LIST.getQuantity()){
+            return STOP_LIST;
+        } else if(dishQuantity == NORMAL.getQuantity()){
+            return NORMAL;
+        } else if(dishQuantity == PLAY_LIST.getQuantity()){
+            return PLAY_LIST;
+        } else return RESTRICTION;
     }
 
-    public List<OrderDto> getOrdersByStatus(Integer waiterId, Integer orderId, OrderStatus orderStatus) {
-        List<Order> orderEntities;
-        if (waiterId == null) {
-            orderEntities = orderRepository.getAllByOrderStatus(orderStatus.getTitle());
-        } else {
-            orderEntities = orderRepository.getAllByWaiterIdAndOrderStatus(waiterId, orderStatus.getTitle());
-        }
-        if (orderId != null) {
-            orderEntities = orderEntities.stream()
-                    .filter(x -> x.getId() == orderId)
-                    .collect(Collectors.toList());
-        }
-        return orderEntities.stream()
-                .map(x -> OrderConverter.toOrderDTO(x, orderDishesRepository.getAllByOrderId(x.getId())))
+
+    public List<OrderDto> getOrdersByStatus(OrderStatus orderStatus) {
+        return orderRepository.getAllByOrderStatus(orderStatus.getTitle()).stream()
+                .map(OrderConverter :: toOrderDTO)
                 .collect(Collectors.toList());
     }
+
 
     public List<MenuDto> getDishesInMenu(String column, String name) {
         if (column.equals("name")) {
@@ -107,29 +115,32 @@ public class OrderService {
         }
     }
 
+    @Transactional
     public void removeDishFromOrder(DeleteDishDto deleteDishDto) {
-        OrderDishes orderDishes = orderDishesRepository.getById(deleteDishDto.getOrderDishId());
-        orderDishesRepository.removeById(deleteDishDto.getOrderDishId());
-        Order order = orderRepository.getById(orderDishes.getOrderId());
-        order.setCheckAmount(order.getCheckAmount() - dishRepository.getById(orderDishes.getDishId()).getPrice());
+        OrderDishes orderDish = orderDishesRepository.getById(deleteDishDto.getOrderDishId());
+        Order order = orderRepository.getById(orderDish.getOrder().getId());
+        order.getOrderDishes().remove(orderDish);
+        order.setCheckAmount(countCheckAmount(order.getOrderDishes()));
         orderRepository.save(order);
+        transferDishToDeletedDishes(deleteDishDto, orderDish);
 
+    }
+    public void transferDishToDeletedDishes(DeleteDishDto deleteDishDto, OrderDishes orderDish){
         deletedDishesRepository.save(DeletedDishes.builder()
-                .order_id(orderDishes.getOrderId())
-                .dish_id(orderDishes.getDishId())
+                .order_id(orderDish.getOrder().getId())
+                .dish_id(orderDish.getDish().getId())
                 .dishStatus(deleteDishDto.getDishStatus().getTitle())
                 .reason(deleteDishDto.getReason())
                 .removalTime(new Date())
                 .build());
-
     }
 
     public void closeDish(Integer orderDishId) {
-        OrderDishes orderDishes = orderDishesRepository.getById(orderDishId);
-        if (orderDishes.getDishStatus().equals(DishStatus.COOKED.getTitle())) {
-            orderDishes.setDishStatus(DishStatus.CLOSED.getTitle());
-            orderDishes.setCloseTime(new Date());
-            orderDishesRepository.save(orderDishes);
+        OrderDishes orderDish = orderDishesRepository.getById(orderDishId);
+        if (orderDish.getDishStatus().equals(DishStatus.COOKED.getTitle())) {
+            orderDish.setDishStatus(DishStatus.CLOSED.getTitle());
+            orderDish.setCloseTime(new Date());
+            orderDishesRepository.save(orderDish);
         } else {
             throw new IllegalArgumentException("This dish is not cooked!");
         }
@@ -143,7 +154,8 @@ public class OrderService {
 
 
     public Double getPercentageOfSalesByOrder(Integer orderId) {
-        return orderRepository.getById(orderId).getDishes().stream()
+        return orderRepository.getById(orderId).getOrderDishes().stream()
+                .map(OrderDishes::getDish)
                 .map(x -> (double) x.getPercentageOfSales() * x.getPrice() / 100)
                 .reduce(0.0, Double::sum);
     }
@@ -160,7 +172,6 @@ public class OrderService {
 
     public void changeWaiter(Integer orderId, Integer waiterId) {
         Order order = orderRepository.getById(orderId);
-
         if (order != null) {
             order.setWaiter(waiterRepository.getById(waiterId));
             orderRepository.save(order);
@@ -168,4 +179,5 @@ public class OrderService {
             throw new IllegalArgumentException("Order does not exist!");
         }
     }
-}
+    }
+

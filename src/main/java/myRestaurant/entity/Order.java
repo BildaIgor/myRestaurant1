@@ -32,12 +32,6 @@ public class Order implements Serializable {
     @JoinColumn(name = "waiter_id",nullable = false)
     private Waiter waiter;
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinTable(name = "orders_dishes",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "dish_id"))
-    private List<Dish> dishes;
-
     @Column(name = "order_status")
     private String orderStatus;
 
@@ -50,4 +44,11 @@ public class Order implements Serializable {
     @Column(name = "paid_time")
     private Date timeOfPaid;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<OrderDishes> orderDishes;
+
+    @Override
+    public String toString() {
+        return "";
+    }
 }

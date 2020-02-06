@@ -30,17 +30,19 @@ public class Dish implements Serializable {
     @Column(name="price")
     private double price;
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinTable(name = "orders_dishes",
-    joinColumns = @JoinColumn(name = "dish_id"),
-    inverseJoinColumns = @JoinColumn(name = "order_id"))
-    private List<Order> orderList;
+    @OneToMany(mappedBy = "dish", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<OrderDishes> orderDishes;
 
     @Column(name = "percentage_of_sales")
     private int percentageOfSales;
 
     @Column(name = "quantity")
     private int quantity;
+
+    @Override
+    public String toString() {
+        return "";
+    }
 
 
 

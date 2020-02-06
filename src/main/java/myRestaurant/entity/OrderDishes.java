@@ -22,11 +22,11 @@ public class OrderDishes implements Serializable {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "order_id")
-    private int orderId;
+  /*  @Column(name = "order_id")
+    private int orderId;*/
 
-    @Column(name = "dish_id")
-    private int dishId;
+   /* @Column(name = "dish_id")
+    private int dishId;*/
 
     @Column(name = "dish_status")
     private String dishStatus;
@@ -42,6 +42,19 @@ public class OrderDishes implements Serializable {
 
     @Column(name = "close_time")
     private Date closeTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "dish_id", nullable = false)
+    private Dish dish;
+
+    @Override
+    public String toString() {
+        return "";
+    }
 
 
 }

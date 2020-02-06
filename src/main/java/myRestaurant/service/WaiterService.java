@@ -1,11 +1,13 @@
 package myRestaurant.service;
 
 import lombok.RequiredArgsConstructor;
+import myRestaurant.converter.DishConverter;
 import myRestaurant.converter.MenuConverter;
 import myRestaurant.dto.MenuDto;
 import myRestaurant.dto.OrderDto;
 import myRestaurant.dto.WaiterDto;
 import myRestaurant.entity.Order;
+import myRestaurant.entity.OrderDishes;
 import myRestaurant.entity.Waiter;
 import myRestaurant.repository.DishRepository;
 import myRestaurant.repository.OrderRepository;
@@ -51,7 +53,9 @@ public class WaiterService {
     }
 
     public List<OrderDto> getPaidOrders(Integer waiterId) {
-        return orderService.getOrdersByStatus(waiterId, null, OrderStatus.PAID);
+        return orderService.getOrdersByStatus(OrderStatus.PAID).stream()
+                .filter(order->order.getWaiterDto().getId() == waiterId)
+                .collect(Collectors.toList());
     }
 
     public Map<MenuDto, Long> getSalesDishesStatistic(Integer waiterId) {
@@ -62,8 +66,9 @@ public class WaiterService {
             orderEntities = orderRepository.getAllByOrderStatus(OrderStatus.REPORTED.getTitle());
         }
         return orderEntities.stream()
-                .flatMap(orderEntity -> orderEntity.getDishes().stream())
-                .map(MenuConverter::toMenuDto)
+                .flatMap(orderEntity -> orderEntity.getOrderDishes().stream())
+                .map(OrderDishes::getDish)
+                .map(MenuConverter :: toMenuDto)
                 .collect(groupingBy(Function.identity(), counting()));
     }
 
@@ -78,7 +83,7 @@ public class WaiterService {
                 WaiterDto.builder()
                         .id(waiter.getId())
                         .name(waiter.getName())
-                        .orders(orderService.getOrdersByStatus(waiter.getId(), null, orderStatus ))
+                        .orders(orderService.getOrdersByStatus(orderStatus))
                         .build())
                 .collect(Collectors.toList());
     }
