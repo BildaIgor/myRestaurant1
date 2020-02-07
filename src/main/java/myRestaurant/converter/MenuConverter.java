@@ -11,6 +11,7 @@ public class MenuConverter {
                 .category(dish.getCategory())
                 .name(dish.getName())
                 .price(dish.getPrice())
+                .quantity(dish.getQuantity())
                 .build();
     }
 }

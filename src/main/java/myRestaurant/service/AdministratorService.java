@@ -10,6 +10,7 @@ import myRestaurant.entity.Dish;
 import myRestaurant.entity.Order;
 import myRestaurant.repository.*;
 import myRestaurant.utils.OrderStatus;
+import myRestaurant.utils.RemainderDishStatus;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,17 +42,17 @@ public class AdministratorService {
 
     public void addDishInPlayList(Integer dishId){
         Dish dish = dishRepository.getById(dishId);
-        dish.setQuantity(500);
+        dish.setQuantity(RemainderDishStatus.PLAY_LIST.getQuantity());
         dishRepository.save(dish);
     }
-    public void addDishInStopList(Integer dishId, Integer balance){
+    public void addDishInRestrictionList(Integer dishId, Integer balance){
         Dish dish = dishRepository.getById(dishId);
         dish.setQuantity(balance);
         dishRepository.save(dish);
     }
     public void setNormalQuantity(Integer dishId){
         Dish dish = dishRepository.getById(dishId);
-        dish.setQuantity(100);
+        dish.setQuantity(RemainderDishStatus.NORMAL.getQuantity());
         dishRepository.save(dish);
     }
     public void makeDiscount(Integer orderId, Double discount){
@@ -71,10 +72,9 @@ public class AdministratorService {
         } else throw new IllegalArgumentException("Order is closed");
     }
     public void closeDay(){
-
         List<Order> orderEntities = orderRepository.getAllByOrderStatus(OrderStatus.PAID.getTitle());
         orderRepository.saveAll(orderEntities.stream()
-                .peek(x -> x.setOrderStatus(OrderStatus.READY_FOR_REPORTED.getTitle()))
+                .peek(order -> order.setOrderStatus(OrderStatus.REPORTED.getTitle()))
                 .collect(Collectors.toList()));
     }
 
@@ -93,6 +93,5 @@ public class AdministratorService {
                 .reduce(0.0, Double::sum)
         );
         return map;
-
     }
 }

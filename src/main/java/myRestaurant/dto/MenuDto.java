@@ -1,5 +1,6 @@
 package myRestaurant.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,8 @@ public class MenuDto {
     private String category;
     private String name;
     private double price;
-    private int percentageOfSales;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private int quantity;
+
 
 }

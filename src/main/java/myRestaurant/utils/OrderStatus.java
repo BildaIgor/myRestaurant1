@@ -4,7 +4,6 @@ public enum OrderStatus {
     OPENED ("OPENED"),
     CLOSED("CLOSED"),
     PAID("PAID"),
-    READY_FOR_REPORTED("READY_FOR_REPORTED"),
     REPORTED("REPORTED");
     private String title;
 

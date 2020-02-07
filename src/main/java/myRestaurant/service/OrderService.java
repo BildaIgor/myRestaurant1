@@ -2,10 +2,12 @@ package myRestaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import myRestaurant.converter.MenuConverter;
-//import myRestaurant.converter.OrderConverter;
 import myRestaurant.converter.OrderConverter;
 import myRestaurant.dto.*;
-import myRestaurant.entity.*;
+import myRestaurant.entity.DeletedDishes;
+import myRestaurant.entity.Dish;
+import myRestaurant.entity.Order;
+import myRestaurant.entity.OrderDishes;
 import myRestaurant.repository.*;
 import myRestaurant.utils.DishStatus;
 import myRestaurant.utils.OrderStatus;
@@ -13,14 +15,11 @@ import myRestaurant.utils.RemainderDishStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static myRestaurant.utils.RemainderDishStatus.*;
-
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +41,7 @@ public class OrderService {
                     .timeOfCreation(new Date())
                     .waiter(waiterRepository.getById(createOrderDto.getWaiterId()))
                     .orderStatus(OrderStatus.OPENED.getTitle())
+                    .discount(1.0)
                     .build();
             orderRepository.save(order);
         }
@@ -66,13 +66,15 @@ public class OrderService {
         order.setCheckAmount(countCheckAmount(order.getOrderDishes()));
         orderRepository.save(order);
     }
-    public double countCheckAmount(List<OrderDishes> orderDishes){
+
+    private double countCheckAmount(List<OrderDishes> orderDishes) {
         return orderDishes.stream()
                 .map(OrderDishes::getDish)
                 .map(Dish::getPrice)
                 .reduce(0.0, Double::sum);
     }
-    public void changeDishQuantity(int dishId) {
+
+    private void changeDishQuantity(int dishId) {
         Dish dish = dishRepository.getById(dishId);
         if (checkDishQuantity(dish).equals(STOP_LIST)) {
             throw new IllegalArgumentException(String.format("Dish with id: %s on a stop-list!", dish.getId()));
@@ -82,13 +84,14 @@ public class OrderService {
             dishRepository.save(dish);
         }
     }
-    public RemainderDishStatus checkDishQuantity(Dish dish){
+
+    private RemainderDishStatus checkDishQuantity(Dish dish) {
         int dishQuantity = dish.getQuantity();
-        if(dishQuantity == STOP_LIST.getQuantity()){
+        if (dishQuantity == STOP_LIST.getQuantity()) {
             return STOP_LIST;
-        } else if(dishQuantity == NORMAL.getQuantity()){
+        } else if (dishQuantity == NORMAL.getQuantity()) {
             return NORMAL;
-        } else if(dishQuantity == PLAY_LIST.getQuantity()){
+        } else if (dishQuantity == PLAY_LIST.getQuantity()) {
             return PLAY_LIST;
         } else return RESTRICTION;
     }
@@ -96,7 +99,7 @@ public class OrderService {
 
     public List<OrderDto> getOrdersByStatus(OrderStatus orderStatus) {
         return orderRepository.getAllByOrderStatus(orderStatus.getTitle()).stream()
-                .map(OrderConverter :: toOrderDTO)
+                .map(OrderConverter::toOrderDTO)
                 .collect(Collectors.toList());
     }
 
@@ -125,7 +128,8 @@ public class OrderService {
         transferDishToDeletedDishes(deleteDishDto, orderDish);
 
     }
-    public void transferDishToDeletedDishes(DeleteDishDto deleteDishDto, OrderDishes orderDish){
+
+    private void transferDishToDeletedDishes(DeleteDishDto deleteDishDto, OrderDishes orderDish) {
         deletedDishesRepository.save(DeletedDishes.builder()
                 .order_id(orderDish.getOrder().getId())
                 .dish_id(orderDish.getDish().getId())
@@ -179,5 +183,5 @@ public class OrderService {
             throw new IllegalArgumentException("Order does not exist!");
         }
     }
-    }
+}
 

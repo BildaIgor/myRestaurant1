@@ -1,11 +1,9 @@
 package myRestaurant.entity;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -21,12 +19,6 @@ public class OrderDishes implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private int id;
-
-  /*  @Column(name = "order_id")
-    private int orderId;*/
-
-   /* @Column(name = "dish_id")
-    private int dishId;*/
 
     @Column(name = "dish_status")
     private String dishStatus;

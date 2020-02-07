@@ -39,7 +39,7 @@ public class AdministratorController {
     @PostMapping("/addDishInStopList")
     public void addDishInStopList(@RequestParam(name = "dishId") Integer dishId,
                                   @RequestParam(name = "balance") Integer balance){
-        administratorService.addDishInStopList(dishId, balance );
+        administratorService.addDishInRestrictionList(dishId, balance );
     }
 
     @PostMapping("/addDishInNormalList")

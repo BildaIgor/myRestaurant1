@@ -9,6 +9,7 @@ public interface OrderDishesRepository extends JpaRepository<OrderDishes, Intege
     List<OrderDishes> getAllByOrderId(int orderId);
     void removeById(int id);
     OrderDishes getById(int id);
-    List<OrderDishes> getAllByDishStatusAndDishStatus(String dishStatus1, String dishStatus2);
+    List<OrderDishes> getAllByDishStatusAndDish_Category(String dishStatus, String dishCategory);
+    List<OrderDishes> getAllByDishStatus(String dishStatus);
 
 }

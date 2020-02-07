@@ -1,6 +1,7 @@
 package myRestaurant.service;
 
 import lombok.RequiredArgsConstructor;
+import myRestaurant.converter.DishConverter;
 import myRestaurant.dto.DishDto;
 import myRestaurant.entity.Cook;
 import myRestaurant.entity.Dish;
@@ -22,32 +23,11 @@ public class CookService {
     private final CookRepository cookRepository;
     private final OrderDishesRepository orderDishesRepository;
 
-    public List<DishDto> getDishesByCategoryAndDishStatus(String category, DishStatus dishStatus) {
-        List<OrderDishes> orderDishesEntities = orderDishesRepository.getAllByDishStatusAndDishStatus(DishStatus.NEW.getTitle(), DishStatus.IN_COOKING.getTitle());
-        List<DishDto> dishDtos = new ArrayList<>();
-        orderDishesEntities.forEach(
-                x -> {
-                    Dish dish = dishRepository.getById(x.getDish().getId());
-                    dishDtos.add(DishDto.builder()
-                            .id(dish.getId())
-                            .orderDishId(x.getId())
-                            .category(dish.getCategory())
-                            .name(dish.getName())
-                            .price(dish.getPrice())
-                            .dishStatus(DishStatus.valueOf(x.getDishStatus()))
-                            .build());
-                }
-        );
-        if (category != null) {
-            return dishDtos.stream()
-                    .filter(x -> x.getCategory().equals(category))
-                    .filter(x -> x.getDishStatus().equals(dishStatus))
-                    .collect(Collectors.toList());
-        } else {
-            return dishDtos.stream()
-                    .filter(x -> x.getDishStatus().equals(dishStatus))
-                    .collect(Collectors.toList());
-        }
+    public List<DishDto> getNewDishesByCategory(String category) {
+        List<OrderDishes> orderDishesEntities = orderDishesRepository.getAllByDishStatusAndDish_Category(DishStatus.NEW.getTitle(), category);
+        return orderDishesEntities.stream()
+                .map(DishConverter :: toDto)
+                .collect(Collectors.toList());
     }
 
     public void startCooking(Integer orderDishId) {
@@ -61,7 +41,7 @@ public class CookService {
 
     public void endCooking(Integer orderDishId) {
         OrderDishes orderDishes = orderDishesRepository.getById(orderDishId);
-        if(orderDishes.getDishStatus().equals(DishStatus.COOKED.getTitle())) {
+        if(orderDishes.getDishStatus().equals(DishStatus.IN_COOKING.getTitle())) {
             orderDishes.setDishStatus(DishStatus.COOKED.getTitle());
             orderDishes.setAndCookingTime(new Date());
             orderDishesRepository.save(orderDishes);

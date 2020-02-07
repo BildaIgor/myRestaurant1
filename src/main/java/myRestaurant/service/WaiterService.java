@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -48,13 +49,14 @@ public class WaiterService {
         Date secondDate = new Date(Integer.parseInt(to[0]) - 1900, Integer.parseInt(to[1]) - 1, Integer.parseInt(to[2]));
         List<Order> orderEntities = orderRepository.getAllByTimeOfCreationBetweenAndWaiterId(firstDate, secondDate, waiterId);
         return orderEntities.stream()
-                .map(x -> orderService.getPercentageOfSalesByOrder(x.getId()))
+                .filter(order -> order.getOrderStatus().equals(OrderStatus.REPORTED.getTitle()))
+                .map(order -> orderService.getPercentageOfSalesByOrder(order.getId()))
                 .reduce(0.0, Double::sum);
     }
 
     public List<OrderDto> getPaidOrders(Integer waiterId) {
         return orderService.getOrdersByStatus(OrderStatus.PAID).stream()
-                .filter(order->order.getWaiterDto().getId() == waiterId)
+                .filter(order -> order.getWaiterDto().getId() == waiterId)
                 .collect(Collectors.toList());
     }
 
@@ -68,7 +70,7 @@ public class WaiterService {
         return orderEntities.stream()
                 .flatMap(orderEntity -> orderEntity.getOrderDishes().stream())
                 .map(OrderDishes::getDish)
-                .map(MenuConverter :: toMenuDto)
+                .map(MenuConverter::toMenuDto)
                 .collect(groupingBy(Function.identity(), counting()));
     }
 
